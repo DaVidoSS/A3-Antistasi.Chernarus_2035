@@ -5,7 +5,7 @@
 //Not commented lines cannot be changed.
 //Don't touch them.
 
-antistasiVersion = "v 1.3.0";
+antistasiVersion = "v 1.3.3";
 
 
 debug = false;//debug variable, not useful for everything..
@@ -97,7 +97,6 @@ _allItems = "
     { getNumber ( _x >> ""type"" ) isEqualTo 131072 } } )
 " configClasses ( configFile >> "cfgWeapons" );
 
-primaryMagazines = [];
 _yaMetidos = [];
 {
 _nombre = configName _x;
@@ -105,7 +104,6 @@ _nombre = [_nombre] call BIS_fnc_baseWeapon;
 if (not(_nombre in _yaMetidos)) then
 	{
 	_magazines = getArray (configFile / "CfgWeapons" / _nombre / "magazines");
-	primaryMagazines pushBack (_magazines select 0);
 	_yaMetidos pushBack _nombre;
 	_weapon = [_nombre] call BIS_fnc_itemType;
 	_weaponType = _weapon select 1;
@@ -129,30 +127,22 @@ activeUSAF = false;
 activeGREF = false;
 hayFFAA = false;
 
-if !(worldName == "Chernarus_2035") then
+if ("LIB_PTRD" in arifles) then
+	{
+	hayIFA = true;
+	cascos = [];
+	humo = ["LIB_RDG","LIB_NB39"];
+	}
+else
 	{
 	if ("rhs_weap_akms" in arifles) then {activeAFRF = true; hayRHS = true};
 	if ("ffaa_armas_hkg36k_normal" in arifles) then {hayFFAA = true};
 	if ("rhs_weap_m4a1_d" in arifles) then {activeUSAF = true; hayRHS = true};
 	if ("rhs_weap_m92" in arifles) then {activeGREF = true; hayRHS = true} else {mguns pushBack "LMG_Mk200_BI_F"};
 	hayIFA = false;
-	}
-else
-	{
-	hayIFA = true;
-	};
-
-if !(hayIFA) then
-	{
 	cascos = cascos select {getNumber (configfile >> "CfgWeapons" >> _x >> "ItemInfo" >> "HitpointsProtectionInfo" >> "Head" >> "armor") > 2};
 	humo = ["SmokeShell","SmokeShellRed","SmokeShellGreen","SmokeShellBlue","SmokeShellYellow","SmokeShellPurple","SmokeShellOrange"];
-	}
-else
-	{
-	cascos = [];
-	humo = ["LIB_RDG","LIB_NB39"];
 	};
-//allItems = [];
 
 titanLaunchers = if ((!hayRHS) and !hayIFA) then
 	{
@@ -302,7 +292,7 @@ vehAA = [vehNATOAA,vehCSATAA];
 vehMRLS = [vehCSATMRLS, vehNATOMRLS];
 vehTransportAir = vehNATOTransportHelis + vehCSATTransportHelis;
 vehFastRope = ["O_Heli_Light_02_unarmed_F","B_Heli_Transport_01_camo_F","RHS_UH60M_d","RHS_Mi8mt_vdv","RHS_Mi8mt_vv","RHS_Mi8mt_Cargo_vv"];
-vehUnlimited = vehTrucks + [vehNATORBoat,vehNATOPatrolHeli,vehCSATRBoat,vehCSATPatrolHeli];
+vehUnlimited = vehNATONormal + vehCSATNormal + [vehNATORBoat,vehNATOPatrolHeli,vehCSATRBoat,vehCSATPatrolHeli,vehNATOUAV,vehNATOUAVSmall,NATOMG,NATOMortar,vehCSATUAV,vehCSATUAVSmall,CSATMG,CSATMortar];
 sniperGroups = [gruposNATOSniper,gruposCSATSniper];
 sniperUnits = ["O_T_Soldier_M_F","O_T_Sniper_F","O_T_ghillie_tna_F","O_V_Soldier_M_ghex_F","B_CTRG_Soldier_M_tna_F","B_T_soldier_M_F","B_T_Sniper_F","B_T_ghillie_tna_F"] + SDKSniper + [FIAMarksman,NATOMarksman,CSATMarksman];
 if (hayRHS) then {sniperUnits = sniperUnits + ["rhsusf_socom_marsoc_sniper","rhs_vdv_marksman_asval"]};
@@ -421,7 +411,28 @@ if (!isServer) exitWith {};
 {server setVariable [_x,75,true]} forEach (sdkTier1 - SDKMil);
 {server setVariable [_x,100,true]} forEach  sdkTier2;
 {server setVariable [_x,150,true]} forEach sdkTier3;
-{timer setVariable [_x,0,true]} forEach (vehAttack + vehNATOAttackHelis + [vehNATOPlane,vehNATOPlaneAA,vehCSATPlane,vehCSATPlaneAA] + vehCSATAttackHelis + vehAA + vehMRLS);
+//{timer setVariable [_x,0,true]} forEach (vehAttack + vehNATOAttackHelis + [vehNATOPlane,vehNATOPlaneAA,vehCSATPlane,vehCSATPlaneAA] + vehCSATAttackHelis + vehAA + vehMRLS);
+{timer setVariable [_x,3,true]} forEach [staticATmalos,staticAAmalos];
+{timer setVariable [_x,6,true]} forEach [staticATmuyMalos,staticAAmuymalos];
+{timer setVariable [_x,0,true]} forEach vehNATOAPC;
+{timer setVariable [_x,10,true]} forEach vehCSATAPC;
+timer setVariable [vehNATOTank,0,true];
+timer setVariable [vehCSATTank,10,true];
+timer setVariable [vehNATOAA,0,true];
+timer setVariable [vehCSATAA,3,true];
+timer setVariable [vehNATOBoat,3,true];
+timer setVariable [vehCSATBoat,3,true];
+timer setVariable [vehNATOPlane,0,true];
+timer setVariable [vehCSATPlane,10,true];
+timer setVariable [vehNATOPlaneAA,0,true];
+timer setVariable [vehCSATPlaneAA,10,true];
+{timer setVariable [_x,1,true]} forEach vehNATOTransportHelis - [vehNATOPatrolHeli];
+{timer setVariable [_x,10,true]} forEach vehCSATTransportHelis - [vehCSATPatrolHeli];
+{timer setVariable [_x,0,true]} forEach vehNATOAttackHelis;
+{timer setVariable [_x,10,true]} forEach vehCSATAttackHelis;
+timer setVariable [vehNATOMRLS,0,true];
+timer setVariable [vehCSATMRLS,5,true];
+
 
 server setVariable [civCar,200,true];//200
 server setVariable [civTruck,600,true];//600
@@ -592,7 +603,9 @@ if (isClass (configFile >> "CfgPatches" >> "task_force_radio")) then
 		"ACE_acc_pointer_green",
 		"ACE_HandFlare_White",
 		"ACE_HandFlare_Red"
-	]; publicVariable "aceItems";
+	];
+	if (hayIFA) then {aceItems append ["ACE_LIB_LadungPM","ACE_SpareBarrel"]};
+	publicVariable "aceItems";
 
 	aceBasicMedItems = [
 		"ACE_fieldDressing",
@@ -624,10 +637,13 @@ if (isClass (configFile >> "CfgPatches" >> "task_force_radio")) then
 
 if (!isNil "ace_common_fnc_isModLoaded") then {
 	unlockedItems = unlockedItems + aceItems;
-	unlockedBackpacks pushBackUnique "ACE_TacticalLadder_Pack";
-	unlockedWeapons pushBackUnique "ACE_VMH3";
-	itemsAAF = itemsAAF + ["ACE_Kestrel4500","ACE_ATragMX"];
-	armasNATO = armasNATO + ["ACE_M84"];
+	if !(hayIFA) then
+		{
+		unlockedBackpacks pushBackUnique "ACE_TacticalLadder_Pack";
+		unlockedWeapons pushBackUnique "ACE_VMH3";
+		itemsAAF = itemsAAF + ["ACE_Kestrel4500","ACE_ATragMX"];
+		armasNATO = armasNATO + ["ACE_M84"];
+		};
 	hayACE = true;
 	if (isClass (configFile >> "CfgSounds" >> "ACE_EarRinging_Weak")) then {
 		hayACEhearing = true;

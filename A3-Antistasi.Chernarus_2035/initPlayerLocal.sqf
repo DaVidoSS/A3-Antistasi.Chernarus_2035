@@ -37,7 +37,7 @@ if (isMultiplayer) then
 	cutText ["Starting Mission","BLACK IN",0];
 	diag_log "Antistasi MP Client. serverInitDone is public";
 	diag_log format ["Antistasi MP Client: JIP?: %1",_isJip];
-	//if (hayTFAR) then {[] execVM "orgPlayers\radioJam.sqf"};//reestablecer cuando controle las variables
+	if (hayTFAR) then {[] execVM "orgPlayers\radioJam.sqf"};//reestablecer cuando controle las variables
 	tkPunish = if (paramsArray select 5 == 1) then {true} else {false};
 	if ((side player == buenos) and tkPunish) then
 		{
@@ -618,7 +618,7 @@ mapa addAction ["Move this asset", "moveHQObject.sqf",nil,0,false,true,"","(_thi
 if (isMultiplayer) then {mapa addAction ["AI Load Info", "[] remoteExec [""AILoadInfo"",2]",nil,0,false,true,"","(_this == theBoss)"]};
 _nul = [player] execVM "OrgPlayers\unitTraits.sqf";
 grupoPetros = group petros;
-grupoPetros setGroupId ["Petros","GroupColor4"];
+grupoPetros setGroupIdGlobal ["Petros","GroupColor4"];
 petros setIdentity "amiguete";
 petros setName "Petros";
 petros disableAI "MOVE";

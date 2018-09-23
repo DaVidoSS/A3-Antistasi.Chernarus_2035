@@ -6,7 +6,8 @@ _esHC = false;
 
 if (count hcSelected player > 1) exitWith {hint "You can select one group only to Fast Travel"};
 if (count hcSelected player == 1) then {_grupo = hcSelected player select 0; _esHC = true} else {_grupo = group player};
-if ((!_esHC) and isMultiplayer) exitWith {hint "You cannot Fast Travel non AI groups in Multiplayer"};
+_checkForPlayer = false;
+if ((!_esHC) and isMultiplayer) then {_checkForPlayer = true};
 _jefe = leader _grupo;
 
 if ((_jefe != player) and (!_esHC)) then {_grupo = player};
@@ -46,7 +47,7 @@ _posicionTel = posicionTel;
 if (count _posicionTel > 0) then
 	{
 	_base = [_marcadores, _posicionTel] call BIS_Fnc_nearestPosition;
-
+	if (_checkForPlayer and ((_base != "SYND_HQ") and !(_base in aeropuertos))) exitWith {hint "Player groups are only allowed to Fast Travel to HQ or Airbases"};
 	if ((lados getVariable [_base,sideUnknown] == malos) or (lados getVariable [_base,sideUnknown] == muyMalos)) exitWith {hint "You cannot Fast Travel to an enemy controlled zone"; openMap [false,false]};
 
 	//if (_base in puestosFIA) exitWith {hint "You cannot Fast Travel to roadblocks and watchposts"; openMap [false,false]};
@@ -60,6 +61,14 @@ if (count _posicionTel > 0) then
 		if (!_esHC) then {disableUserInput true; cutText ["Fast traveling, please wait","BLACK",2]; sleep 2;} else {hcShowBar false;hcShowBar true;hint format ["Moving group %1 to destination",groupID _grupo]; sleep _distancia;};
 		_forzado = false;
 		if (!isMultiplayer) then {if (not(_base in forcedSpawn)) then {_forzado = true; forcedSpawn = forcedSpawn + [_base]}};
+		_exit = false;
+		if (isMultiplayer) then
+			{
+			_vehicles = [];
+			{if (vehicle _x != _x) then {_vehicles pushBackUnique (vehicle _x)}} forEach units _grupo;
+			{if ((vehicle _x) in _vehicles) exitWith {_checkForPlayer = true}} forEach playableUnits;
+			};
+		if (_checkForPlayer and ((_base != "SYND_HQ") and !(_base in aeropuertos))) exitWith {hint format ["%1 Fast Travel has been cancelled because some player has boarded their vehicle and the destination is not HQ or an Airbase",groupID _grupo]};
 		{
 		_unit = _x;
 		if ((!isPlayer _unit) or (_unit == player)) then

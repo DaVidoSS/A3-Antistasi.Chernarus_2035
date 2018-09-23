@@ -35,7 +35,7 @@ _objetivosProv = _objetivos - aeropuertos;
 {
 _posObj = getMarkerPos _x;
 _ladoObj = lados getVariable [_x,sideUnknown];
-if (((marcadores - controles - ciudades) select {lados getVariable [_x,sideUnknown] != _ladoObj}) findIf {getMarkerPos _x distance2D _posObj < 2000} == -1) then {_objetivos = _objetivos - [_x]};
+if (((marcadores - controles - ciudades - puestosFIA) select {lados getVariable [_x,sideUnknown] != _ladoObj}) findIf {getMarkerPos _x distance2D _posObj < 2000} == -1) then {_objetivos = _objetivos - [_x]};
 } forEach _objetivosProv;
 
 if (_objetivos isEqualTo []) exitWith {};
@@ -63,10 +63,12 @@ if (lados getVariable [_base,sideUnknown] == malos) then
 else
 	{
 	_baseNATO = false;
-	_tmpObjetivos = _objetivos select {lados getVariable [_x,sideUnknown] != muyMalos}
+	_tmpObjetivos = _objetivos select {lados getVariable [_x,sideUnknown] != muyMalos};
+	_tmpObjetivos = _tmpObjetivos - (ciudades select {(((server getVariable _x) select 2) + ((server getVariable _x) select 3) < 90) and ([_x] call powerCheck != malos)});
 	};
 
 _tmpObjetivos = _tmpObjetivos select {getMarkerPos _x distance2D _posBase < distanceForAirAttack};
+if (_tmpObjetivos isEqualTo []) exitWith {};
 _cercano = [_tmpObjetivos,_base] call BIS_fnc_nearestPosition;
 	{
 	_esCiudad = if (_x in ciudades) then {true} else {false};

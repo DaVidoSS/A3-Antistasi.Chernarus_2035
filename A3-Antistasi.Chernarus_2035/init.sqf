@@ -2,18 +2,14 @@
 //Do whatever you want with this code, but credit me for the thousand hours spent making this.
 enableSaving [false,false];
 mapa setObjectTexture [0,"pic.jpg"];
+private _types = ["wreck","garbagepallet","garbage_misc","datsun01t","garbagewashingmachine_f","hiluxt","datsun02t","misc_cargo","mil_guardhouse"]; 
+private _objects = (nearestTerrainObjects [[10240,10240,0], ["HIDE","HOUSE"], 15000]); 
+private ["_obj","_type"]; 
 { 
- if ( 
- (toLower(str _x) find "wreck") >= 0 || 
- {(toLower(str _x) find "garbagepallet") >= 0} || 
- {(toLower(str _x) find "datsun01t") >= 0} || 
- {(toLower(str _x) find "garbagewashingmachine_f") >= 0} || 
- {(toLower(str _x) find "hiluxt") >= 0} ||
- {(toLower(str _x) find "datsun02t") >= 0}
- ) then { 
-  hideObject _x; 
- }; 
-} foreach (nearestTerrainObjects [[10240,10240,0], ["HIDE"], 10500]);
+_obj = _x; 
+_type = toLower(str _obj); 
+if (({if ((_type find _x) > -1) exitWith {1}; false} count _types) isEqualTo 1) then {hideObject _obj}; 
+} forEach _objects;
 if (isServer and (isNil "serverInitDone")) then {skipTime random 24};
 
 if (!isMultiPlayer) then
@@ -76,18 +72,6 @@ if (!isMultiPlayer) then
         }];
     deleteMarker "respawn_east";
     if (buenos == independent) then {deleteMarker "respawn_west"} else {deleteMarker "respawn_guerrila"};
-    }
-else
-    {/*
-    if !(isServer) then
-        {
-        membershipEnabled = if (paramsArray select 2 == 1) then {true} else {false};
-        switchCom = if (paramsArray select 3 == 1) then {true} else {false};
-        tkPunish = if (paramsArray select 4 == 1) then {true} else {false};
-        distanciaMiss = paramsArray select 5;
-        skillMult = paramsArray select 8;
-        minWeaps = paramsArray select 9;
-        civTraffic = paramsArray select 10;
-        };*/
     };
 0 = [] execVM "Scripts\improvements\show_fps.sqf";
+0 = [true] execVM "Scripts\improvements\TFAR_autofreq.sqf";

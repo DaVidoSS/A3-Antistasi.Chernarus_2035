@@ -198,7 +198,7 @@ else
 	};
 
 //if (debug) then {hint format ["Nos contraatacan desde %1 o desde el aeropuerto %2 hacia %3", _base, _aeropuerto,_marcador]; sleep 5};
-diag_log format ["Antistasi PatrolCA: CA performed from %1 to %2",_aeropuerto,_marcador];
+diag_log format ["Antistasi PatrolCA: CA performed from %1 to %2.Is waved:%3.Is super:%4",_aeropuerto,_marcador,_inWaves,_super];
 //_config = if (_lado == malos) then {cfgNATOInf} else {cfgCSATInf};
 
 _soldados = [];
@@ -248,7 +248,7 @@ if (_base != "") then
 				};
 			};
 		};
-	if (count _vehPool == 0) then {if (_lado == malos) then {_vehPool = vehNATOTrucks} else {_vehPool = vehCSATTrucks}};
+	if (_vehPool isEqualTo []) then {if (_lado == malos) then {_vehPool = vehNATOTrucks} else {_vehPool = vehCSATTrucks}};
 	_cuenta = if (!_super) then {if (_esMarcador) then {2} else {1}} else {round ((tierWar + difficultyCoef) / 2) + 1};
 	_landPosBlacklist = [];
 	for "_i" from 1 to _cuenta do
@@ -404,6 +404,7 @@ if (_base != "") then
 			_Vwp0 setWaypointStatements ["true","{if (side _x != side this) then {this reveal [_x,4]}} forEach allUnits"];
 			_veh allowCrewInImmobile true;
 			};
+		_vehPool = _vehPool select {[_x] call vehAvailable}
 		};
 	diag_log format ["Antistasi PatrolCA: Land CA performed on %1, Type is %2, Vehicle count: %3, Soldier count: %4",_marcador,_typeOfAttack,count _vehiculos,count _soldados];
 	};
@@ -596,6 +597,7 @@ if (_aeropuerto != "") then
 				};
 			};
 		sleep 30;
+		_vehPool = _vehPool select {[_x] call vehAvailable};
 		};
 	diag_log format ["Antistasi PatrolCA: Air CA performed on %1, Type is %2, Vehicle count: %3, Soldier count: %4",_marcador,_typeOfAttack,count _vehiculos,count _soldados];
 	};
